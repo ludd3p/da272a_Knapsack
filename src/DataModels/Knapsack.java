@@ -35,6 +35,28 @@ public class Knapsack {
         currentVolume += item.getVolume();
     }
 
+    public int getTotalValue(){
+        return totalValue;
+    }
+
+    public boolean checkFull(){
+        return currentVolume != maxVolume;
+    }
+
+    public int getRemainingVolume() {
+        return maxVolume - currentVolume;
+    }
+
+    public Item getHeaviestItem(int weight) {
+        Item bestMatch = new Item(0,0);
+        for (Item i : items) {
+           if (i.getVolume() <= weight){
+               if (bestMatch.getVolume() < i.getVolume()) bestMatch = i;
+           }
+        }
+        return bestMatch;
+    }
+
     @Override
     public String toString() {
         return "Knapsack{" +

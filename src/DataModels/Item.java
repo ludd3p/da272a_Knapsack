@@ -29,4 +29,11 @@ public class Item {
         return (value/volume);
     }
 
+    @Override
+    public String toString() {
+        return "Item{" +
+                "volume=" + volume +
+                ", value=" + value +
+                '}';
+    }
 }
