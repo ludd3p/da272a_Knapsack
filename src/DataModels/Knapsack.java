@@ -23,6 +23,8 @@ public class Knapsack {
 
     public void removeItem(Item item){
         items.remove(item);
+        currentVolume -= item.getVolume();
+        totalValue -= item.getValue();
     }
 
     public boolean checkItemFit(Item item){
@@ -49,6 +51,7 @@ public class Knapsack {
 
     public Item getHeaviestItem(int weight) {
         Item bestMatch = new Item(0,0);
+
         for (Item i : items) {
            if (i.getVolume() <= weight){
                if (bestMatch.getVolume() < i.getVolume()) bestMatch = i;

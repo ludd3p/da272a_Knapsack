@@ -15,7 +15,6 @@ public class KnapsackController {
         //greedyAlgorithm();
         badKnapsackData();
 
-
         for (Knapsack k : knapsackList) {
             System.out.println(k.toString());
         }
@@ -57,6 +56,7 @@ public class KnapsackController {
         knapsackList = new ArrayList<>();
         knapsackList.add(new Knapsack(rnd.nextInt(20, 50)));
         knapsackList.add(new Knapsack(rnd.nextInt(40, 100)));
+        knapsackList.add(new Knapsack(rnd.nextInt(40, 100)));
     }
 
     /**
@@ -93,30 +93,28 @@ public class KnapsackController {
     }
 
     public void neighborhood(){
-        int combinedKnapsackValue = 0;
+        int greedyKnapsackValue = 0;
         boolean spaceExists = false;
-        ArrayList <Knapsack> localSearchResult = new ArrayList<>();
 
         for (Knapsack k : knapsackList) {
-            combinedKnapsackValue += k.getTotalValue();
+            greedyKnapsackValue += k.getTotalValue();
             if (!spaceExists) spaceExists = k.checkFull();
         }
 
-        System.out.println("Remaining items " + itemList.size());
         if (spaceExists && itemList.size() > 0) {
             System.out.println("Free space in at least one of the knapsacks, trying to optimize space used");
-                localSearchResult = optimizeKnapsacks();
-                if (combinedKnapsackValue < valueOfAllKnapsacks(localSearchResult)) {
-                    System.err.println("Better solution found using local search.");
+                knapsackList = optimizeKnapsacks();
+                if (greedyKnapsackValue < valueOfAllKnapsacks()) {
+                    System.out.println("Better solution found using neighborhood search.");
+                    System.out.println("Combined value after greedy algo = " + greedyKnapsackValue + ". Combined value after neighborhood search = " + valueOfAllKnapsacks());
                 }
         }
-        System.out.println("Final result of neighborhood search:" + "\n");
-        System.out.println("GREEDY VALUE = " + combinedKnapsackValue +", LOCAL OPTIMA VALUE = " + valueOfAllKnapsacks(localSearchResult) + "\n");
+
     }
 
-    private static int valueOfAllKnapsacks(ArrayList<Knapsack> knapsacks) {
+    private int valueOfAllKnapsacks() {
         int totalValue = 0;
-        for(Knapsack sack : knapsacks) totalValue += sack.getTotalValue();
+        for(Knapsack sack : knapsackList) totalValue += sack.getTotalValue();
         return totalValue;
     }
 
@@ -131,24 +129,26 @@ public class KnapsackController {
                     Knapsack nextKnapsack = knapsackList.get(nextKnapsackIndex); // Fetches next Knapsack in line
                     Item nextKnapsackHeaviestItem = nextKnapsack.getHeaviestItem(k.getRemainingVolume()); // Checks if another Knapsack contains an item that is <= to the remaining space in the current Knapsack
 
-                    if (nextKnapsackHeaviestItem.getVolume() != 0) { // Checks if volume is <0 because every item has a volume of >=1 except if getHeaviestItem doesn't have a matching item.
+                    if (!nextKnapsack.checkFull() && nextKnapsackHeaviestItem.getVolume() != 0) { // Checks if volume is !0 because every item has a volume of >=1 except if getHeaviestItem doesn't have a matching item.
                         nextKnapsack.removeItem(nextKnapsackHeaviestItem); // Removes the item that is moved from donor list.
                         k.addItem(nextKnapsackHeaviestItem); // Adds the item to the recipient list.
                         System.out.println("Item: " + nextKnapsackHeaviestItem + " successfully moved to list: " + knapsackList.indexOf(k) + " from list: " + nextKnapsackIndex);
-
+                        Item item;
+                        for (int i = 0; i < itemList.size(); i++) { // Iterates through the remaining items to see if there is one that fits.
+                            item = itemList.get(i);
+                            if (nextKnapsack.checkItemFit(item)) {
+                                nextKnapsack.addItem(item);
+                                itemList.remove(item);
+                                i--;
+                                System.out.println("Item added: " + item + " to list: " + knapsackList.indexOf(nextKnapsack));
+                            }
+                        }
                     }
+
                     nextKnapsackIndex = ((nextKnapsackIndex+1) % knapsackList.size()); // Sets next index to check
                 }
 
-                Item item;
-                for (int i = 0; i < itemList.size(); i++) { // Iterates through the remaining items to see if there is one that fits.
-                    item = itemList.get(i);
-                    if (k.checkItemFit(item)) {
-                        k.addItem(item);
-                        itemList.remove(item);
-                        i--;
-                    }
-                }
+
 
             }
         }
