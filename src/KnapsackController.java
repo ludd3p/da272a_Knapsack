@@ -119,7 +119,7 @@ public class KnapsackController {
             HashSack  optimizeSack = hashSackList.get(i);
             int capacity = optimizeSack.getCapacity();
 
-            // already optimized
+            // optimized sack is already optimized
             if(capacity == 0){
                 return;
             }
@@ -128,22 +128,22 @@ public class KnapsackController {
             for (int j = i+1; j < hashSackList.size(); j++) {
                 HashSack sack = hashSackList.get(j);
 
-                // don't remove items from an optimized sack
+                // don't remove items from an already optimized sack
                 if(sack.getCapacity() == 0){
                     return;
                 }
-                // capacity should be small
-                for (int k = capacity; k > 0; k--) {
-                    if(sack.getHashMap().containsKey(capacity)){
-                        // get item from sack where key = capacity left in sack to optimize
-                        Item item = sack.getHashMap().get(capacity);
-                        // remove the item from the sack
-                        sack.removeItem(item);
-                        // add the item to the optimizedSack
-                        optimizeSack.addItem(item);
-                        // put to optimizedSack
-                        // else return and look for an item with '1'  less weight in next iteration
-                    }
+
+                // if the sack contains an item which corresponds to space left in knapsack to optimize
+                if(sack.getHashMap().containsKey(capacity)){
+                    // get item from sack where key = capacity left in sack to optimize
+                    Item item = sack.getHashMap().get(capacity);
+                    // remove the item from the sack
+                    sack.removeItem(item);
+                    // add the item to the optimizedSack
+                    optimizeSack.addItem(item);
+                }
+                else if (capacity % 2 == 0){
+                    // we know that we're looking for an item with even weight, E.g 22, 20, 18
                 }
             }
         }
