@@ -3,6 +3,8 @@ package DataModels;
 public class Item {
     private int volume;
     private int value;
+    //adding binary decision variable
+    private boolean isChosen;
 
     public Item (int volume, int value) {
         this.volume = volume;
@@ -27,6 +29,14 @@ public class Item {
 
     public double getWeightedValue() {
         return (value/volume);
+    }
+
+    public boolean isChosen() {
+        return isChosen;
+    }
+
+    public void setChosen(boolean chosen) {
+        isChosen = chosen;
     }
 
     @Override
