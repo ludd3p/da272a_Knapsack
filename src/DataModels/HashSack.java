@@ -8,6 +8,10 @@ import java.util.HashMap;
  */
 public class HashSack {
 
+    public HashMap<Integer, Item> getHashMap() {
+        return knapSackHashMap;
+    }
+
     // key = volume/weight of item, value = item
     private final HashMap<Integer, Item> knapSackHashMap;
 
@@ -25,7 +29,11 @@ public class HashSack {
     public boolean checkItemFIt(Item item) {
         return (capacity - item.getVolume()) >= 0;
     }
-
+    public void removeItem(Item item){
+        int key = item.getVolume();
+        getHashMap().remove(key);
+        capacity += key;
+    }
     /**
      * @return
      */

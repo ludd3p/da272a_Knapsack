@@ -1,3 +1,4 @@
+import DataModels.HashSack;
 import DataModels.Item;
 import DataModels.Knapsack;
 
@@ -8,7 +9,7 @@ import java.util.Random;
 public class KnapsackController {
     private ArrayList<Item> itemList;
     private ArrayList<Knapsack> knapsackList;
-
+    private ArrayList<HashSack> hashSackList;
     public KnapsackController() {
         generateItems(100);
         //generateKnapsacks();
@@ -110,6 +111,42 @@ public class KnapsackController {
                 }
         }
 
+    }
+    // expected to run in  n^2
+    public void hashNeighbourHood(){
+        // iterate over list of knapsacks
+        for (int i = 0; i < hashSackList.size(); i++) {
+            HashSack  optimizeSack = hashSackList.get(i);
+            int capacity = optimizeSack.getCapacity();
+
+            // already optimized
+            if(capacity == 0){
+                return;
+            }
+
+            // iterate over i+1
+            for (int j = i+1; j < hashSackList.size(); j++) {
+                HashSack sack = hashSackList.get(j);
+
+                // don't remove items from an optimized sack
+                if(sack.getCapacity() == 0){
+                    return;
+                }
+                // capacity should be small
+                for (int k = capacity; k > 0; k--) {
+                    if(sack.getHashMap().containsKey(capacity)){
+                        // get item from sack where key = capacity left in sack to optimize
+                        Item item = sack.getHashMap().get(capacity);
+                        // remove the item from the sack
+                        sack.removeItem(item);
+                        // add the item to the optimizedSack
+                        optimizeSack.addItem(item);
+                        // put to optimizedSack
+                        // else return and look for an item with '1'  less weight in next iteration
+                    }
+                }
+            }
+        }
     }
 
     private int valueOfAllKnapsacks() {
