@@ -33,9 +33,7 @@ public class TreeSack {
     public void removeItem(Item item){
         int key = item.getVolume();
         getTreeMap().remove(key);
-        System.out.println("before" + capacity);
         capacity += key;
-        System.out.println("after " + capacity);
     }
     /**
      * @return
