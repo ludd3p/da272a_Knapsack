@@ -13,7 +13,8 @@ public class KnapsackController {
         badTreeData();
 
         //greedyTree();
-        neighbourHoodSearch2();
+        //neighbourHoodSearch();
+        perfectMatching();
 
         //generateKnapsacks();
         //greedyAlgorithm();
@@ -217,8 +218,11 @@ public class KnapsackController {
         to.addItem(itemToSwap);
     }
 
-
-    public void neighbourHoodSearch2(){
+    /**
+     * Looks for ways to fill knapsacks to the brim by either moving and item from another knapsack that is not full,
+     * or finding a pair of items that can be swapped between the knapsacks to fill it.
+     */
+    public void perfectMatching(){
         // iterate over list of knapsacks
         for (TreeSack optimizingSack : treeSackList) {
             int capacity = optimizingSack.getCapacity();
@@ -237,7 +241,7 @@ public class KnapsackController {
                     continue;
                 }
 
-                // if the sack contains an item which corresponds to space left in knapsack to optimize
+                // Checks if the next sack contains an item that can be moved to fill first knapsack without swapping items.
                 if(nextSack.getTreeMap().containsKey(capacity)){
                     // get item from sack where key = capacity left in sack to optimize
                     Item item = nextSack.getTreeMap().get(capacity).get(0);
@@ -246,18 +250,18 @@ public class KnapsackController {
                     // add the item to the optimizedSack
                     optimizingSack.addItem(item);
                 }
+                // Checks if next knapsack contains an item that is larger than the remaining space in first knapsack to see if potential swap is possible
                 else if (nextSack.getTreeMap().ceilingKey(capacity) != null){
+                    // Iterates through the keys (unique weights) of items in first knapsack
                     for (List<Item> items : optimizingSack.getTreeMap().values()) {
-                        for (Item item : items) {
-                            if (nextSack.getTreeMap().containsKey(capacity + item.getVolume())) {
+                        // Checks next knapsack to find an item that matches remaining capacity + the volume of item to be swapped
+                            if (nextSack.getTreeMap().containsKey(capacity + items.get(0).getVolume())) {
                                 // get item from sack where key = capacity left in sack to optimize
-                                Item item2 = nextSack.getTreeMap().get((capacity + item.getVolume())).get(0);
+                                Item item2 = nextSack.getTreeMap().get((capacity + items.get(0).getVolume())).get(0);
                                 // remove the item from the sack
-                                nextSack.removeItem(item);
+                                nextSack.removeItem(items.get(0));
                                 // add the item to the optimizedSack
                                 optimizingSack.addItem(item2);
-                        }
-
                         }
                     }
                 }
