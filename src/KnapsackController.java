@@ -59,6 +59,7 @@ public class KnapsackController {
         treeSackList.get(2).addItem(new Item(6,1));
         treeSackList.get(2).addItem(new Item(3,1));
         treeSackList.get(3).addItem(new Item(20, 1));
+
     }
 
     /**
@@ -104,6 +105,21 @@ public class KnapsackController {
             for (TreeSack t : treeSackList) {
                 if (t.checkItemFit(item)) {
                     t.addItem(item);
+                    itemList.remove(item);
+                    i--;
+                    break;
+                }
+            }
+        }
+    }
+    public void greedyTree(){
+        Item item;
+        sortItems();
+        for (int i = 0; i < itemList.size(); i++) {
+            item = itemList.get(i);
+            for (TreeSack sack : treeSackList) {
+                if (sack.checkItemFit(item)) {
+                    sack.addItem(item);
                     itemList.remove(item);
                     i--;
                     break;
@@ -205,6 +221,7 @@ public class KnapsackController {
         }
     }
 
+
     /**
      * Time complexity: worst case o(n) where n = nodes in tree
      * Checks for possible swaps that will fill the first knapsack perfectly.
@@ -224,6 +241,7 @@ public class KnapsackController {
             }
         }
     }
+
 
     /**
      * Method to move items between knapsacks.

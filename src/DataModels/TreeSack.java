@@ -17,7 +17,6 @@ public class TreeSack {
     // represents space left in knapsack
     private int capacity;
 
-
     /**
      * @param capacity init to whatever weight u want bag to hold
      */
