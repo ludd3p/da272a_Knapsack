@@ -7,27 +7,37 @@ public class KnapsackController {
     private ArrayList<Item> itemList;
     private ArrayList<TreeSack> treeSackList;
     public KnapsackController() {
+        //Generate set of items
         generateItems(100000);
+        //Sort the items
         sortItems();
-       // generateTrees();
-       // greedyAlgorithm();
 
-        badTreeData();
+        //Generate trees
+        //generateTrees();      // For real use
 
-        printTreeSackData();
+        badTreeData();          // Generate trees with data that we know can be improved for testing purposes
+        printTreeSackData();    // before algo is run
+        System.out.println("--------^ BEFORE ALGORITHM ^-------\n\n");
 
-        neighborhoodSearchz();
-        //neighbourHoodSearch();
+        greedyAlgorithm();      // run initial greedy
+        printTreeSackData();    // after greedy is run, before neighbourhood
 
-        printTreeSackData();
-        greedyAlgorithm();
-        printTreeSackData();
+        System.out.println("---------^ AFTER GREEDY ALGO ^ -----------\n\n");
+        neighborhoodSearchz();  // search for better solutions in neighborhood
+        printTreeSackData();    // after neighbourhood
+        System.out.println("---------^ AFTER NEIGHBOURHOOD ALGO ^ -----------\n\n");
+
+        greedyAlgorithm();      // Run greedy again to try add new item after neighborhood search
+        printTreeSackData();    // Print the final result
     }
 
     public void printTreeSackData() {
         for (TreeSack sack: treeSackList){
+            System.out.println(treeSackList.indexOf(sack));
             System.out.println(sack.toString());
+            System.out.println("Remaining capacity: " + sack.getCapacity() + " value: " + sack.getTotalValue());
         }
+        System.out.println("Total value of all knapsacks: " + valueOfAllKnapsacks());
     }
     public void badTreeData() {
         treeSackList = new ArrayList<>();
@@ -49,8 +59,6 @@ public class KnapsackController {
         treeSackList.get(2).addItem(new Item(6,1));
         treeSackList.get(2).addItem(new Item(3,1));
         treeSackList.get(3).addItem(new Item(20, 1));
-
-
     }
 
     /**
@@ -117,17 +125,24 @@ public class KnapsackController {
         }
     }
 
+    /**
+     * Looks for an item to put in the knapsack that is to be optimized by checking if the
+     * next knapsack in the list in the list contains an item which has a weight equal to the remaining capacity of
+     * the knapsack that is to be optimized. This is achieved by running .contains(key) where key = remaining capacity
+     * of optimizing sack.
+     * @param optimizingSack sack to optimize
+     */
     public void checkForPerfectMove(TreeSack optimizingSack){
         int capacity;
-        int nextHashSackIndex = ((treeSackList.indexOf(optimizingSack) + 1) % treeSackList.size());
-        while (treeSackList.indexOf(optimizingSack) != nextHashSackIndex ) {
+        int nextTreeSackIndex = ((treeSackList.indexOf(optimizingSack) + 1) % treeSackList.size());
+        while (treeSackList.indexOf(optimizingSack) != nextTreeSackIndex ) {
             capacity = optimizingSack.getCapacity();
-            TreeSack nextSack = treeSackList.get(nextHashSackIndex);
+            TreeSack nextSack = treeSackList.get(nextTreeSackIndex);
 
             // Don't remove items from an already optimized sack
             if (nextSack.getCapacity() == 0) {
                 System.out.println("Next sack is full, dont remove items. Continue.");
-                nextHashSackIndex = ((nextHashSackIndex + 1) % treeSackList.size());
+                nextTreeSackIndex = ((nextTreeSackIndex + 1) % treeSackList.size());
                 continue;
             }
 
@@ -136,21 +151,21 @@ public class KnapsackController {
                 System.out.println("Perfect move available!");
                 moveItem(optimizingSack, nextSack, nextSack.getTreeMap().get(capacity).get(0));
             }
-            nextHashSackIndex = ((nextHashSackIndex+1) % treeSackList.size());
+            nextTreeSackIndex = ((nextTreeSackIndex+1) % treeSackList.size());
         }
     }
 
     public void checkForPerfectSwap(TreeSack optimizingSack) {
         int capacity = optimizingSack.getCapacity();
         if (capacity == 0) return;
-        int nextHashSackIndex = ((treeSackList.indexOf(optimizingSack) + 1) % treeSackList.size());
-        while (treeSackList.indexOf(optimizingSack) != nextHashSackIndex ) {
-            TreeSack nextSack = treeSackList.get(nextHashSackIndex);
+        int nextTreeSackIndex = ((treeSackList.indexOf(optimizingSack) + 1) % treeSackList.size());
+        while (treeSackList.indexOf(optimizingSack) != nextTreeSackIndex ) {
+            TreeSack nextSack = treeSackList.get(nextTreeSackIndex);
 
             // Don't remove items from an already optimized sack
             if (nextSack.getCapacity() == 0) {
                 System.out.println("Next sack is full, dont remove items. Continue.");
-                nextHashSackIndex = ((nextHashSackIndex + 1) % treeSackList.size());
+                nextTreeSackIndex = ((nextTreeSackIndex + 1) % treeSackList.size());
                 continue;
             }
             // Checks if next knapsack contains an item that is larger than the remaining space in first knapsack to see if potential swap is possible
@@ -158,21 +173,26 @@ public class KnapsackController {
                 System.out.println("Checking for perfect swap");
                 searchMatchedSwap(optimizingSack, nextSack, capacity);
             }
-            nextHashSackIndex = ((nextHashSackIndex+1) % treeSackList.size());
+            nextTreeSackIndex = ((nextTreeSackIndex+1) % treeSackList.size());
         }
     }
 
+    /**
+     * Looks for an item which is equal to or less than the remaining capacity of optimizing sack by running the
+     * .floor(key) where key = remaining capacity of optimizing sack
+     * @param optimizingSack sack to optimize
+     */
     public void checkForSmallerItem(TreeSack optimizingSack){
         int capacity = optimizingSack.getCapacity();
         if (capacity == 0) return;
-        int nextHashSackIndex = ((treeSackList.indexOf(optimizingSack) + 1) % treeSackList.size());
-        while (treeSackList.indexOf(optimizingSack) != nextHashSackIndex ) {
-            TreeSack nextSack = treeSackList.get(nextHashSackIndex);
+        int nextTreeSackIndex = ((treeSackList.indexOf(optimizingSack) + 1) % treeSackList.size());
+        while (treeSackList.indexOf(optimizingSack) != nextTreeSackIndex ) {
+            TreeSack nextSack = treeSackList.get(nextTreeSackIndex);
 
             // Don't remove items from an already optimized sack
             if (nextSack.getCapacity() == 0) {
                 System.out.println("Next sack is full, dont remove items. Continue.");
-                nextHashSackIndex = ((nextHashSackIndex + 1) % treeSackList.size());
+                nextTreeSackIndex = ((nextTreeSackIndex + 1) % treeSackList.size());
                 continue;
             }
             // Checks if next knapsack contains an item that is larger than the remaining space in first knapsack to see if potential swap is possible
@@ -181,11 +201,12 @@ public class KnapsackController {
                 int key = nextSack.getTreeMap().floorKey(capacity);
                 moveItem(optimizingSack, nextSack, nextSack.getTreeMap().get(key).get(0));
             }
-            nextHashSackIndex = ((nextHashSackIndex+1) % treeSackList.size());
+            nextTreeSackIndex = ((nextTreeSackIndex+1) % treeSackList.size());
         }
     }
 
     /**
+     * Time complexity: worst case o(n) where n = nodes in tree
      * Checks for possible swaps that will fill the first knapsack perfectly.
      * Works by looking for items that matches the volume of remaining capacity plus the volume of an item to be swapped away.
      * @param optimizingSack Knapsack to be optimized
@@ -236,8 +257,7 @@ public class KnapsackController {
 
 
 
-
-    // expected to run in  n^2
+    // LEGACY, not used.
     public void neighbourHoodSearch(){
         // iterate over list of knapsacks
         for (int i = 0; i < treeSackList.size(); i++) {
@@ -301,7 +321,7 @@ public class KnapsackController {
 
     private int valueOfAllKnapsacks() {
         int totalValue = 0;
-       // for(TreeSack sack : treeSackList) totalValue += sack.getTotalValue();
+        for(TreeSack sack : treeSackList) totalValue += sack.getTotalValue();
         return totalValue;
     }
 
